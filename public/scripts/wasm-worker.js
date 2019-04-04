@@ -41,26 +41,22 @@ async function detectUrl (width, height, imageData) {
   try {
 
     wasmResult = null;
-
+    const preallocatedBuffer = wasmApi.create_buffer(width, height);
+    
     const d = imageData.data;
 
     // convert the image data to grayscale 
 		const grayData = []
 		for (var i = 0, j = 0; i < d.length; i += 4, j++) {
-			grayData[j] = (d[i] * 66 + d[i + 1] * 129 + d[i + 2] * 25 + 4096) >> 8;
-		}
+      grayData[j] = (d[i] * 66 + d[i + 1] * 129 + d[i + 2] * 25 + 4096) >> 8;
+    }
 
-		// put the data into the allocated buffer
-		const p = wasmApi.create_buffer(width, height);
-    Module.HEAP8.set(grayData, p);
-    //Module.HEAP8.set(d, p);
+    Module.HEAPU8.set(grayData, preallocatedBuffer);
 
-		// call the scanner function
-		wasmApi.scan_image(p, width, height)
-
-		// clean up (this is not really necessary in this example, but is used to demonstrate how you can manage Wasm heap memory from the js environment)
-    wasmApi.destroy_buffer(p);
-    //console.log('wasmresult', wasmResult);
+    wasmApi.scan_image(preallocatedBuffer, width, height)
+    // clean up (this is not really necessary in this example, but is used to demonstrate how you can manage Wasm heap memory from the js environment)
+    // wasmApi.destroy_buffer(preallocatedBuffer);
+    
     return wasmResult;
   } catch (err) {
     // the library throws an excpetion when there are no qrcodes.
