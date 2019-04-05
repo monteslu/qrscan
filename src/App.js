@@ -15,7 +15,7 @@ class App extends Component {
 
     console.log(this.canvasRef);
     const constraints = {
-      video: true, //{width: {exact: 320}},
+      video: {width: {exact: 720}},
       audio: false
     };
 
