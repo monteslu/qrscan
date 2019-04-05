@@ -1,5 +1,5 @@
 importScripts('rawr.bundle.js');
-importScripts('jsqr.bundle.js');
+importScripts('jsqrcode.bundle.js');
 
 const rawrPeer = rawr({transport: rawr.transports.worker()});
 self.rawrPeer = rawrPeer; // for devtools
