@@ -11,18 +11,17 @@ class App extends Component {
 
   canvasRef = React.createRef();
 
-  componentDidMount() {
+  async componentDidMount() {
 
     console.log(this.canvasRef);
     const constraints = {
-      video: {width: {exact: 720}},
+      video: true, //{width: {exact: 720}},
       audio: false
     };
 
-    return navigator.mediaDevices.getUserMedia(constraints)
-    .then((stream) => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(constraints)
       
-      //console.log('stream', stream);
       const track = stream.getVideoTracks()[0];
       
       const videoElement = document.createElement('video');
@@ -46,52 +45,45 @@ class App extends Component {
 
         let times = [];
         
-        const onframe = () => {
-          
+        const onframe = async () => {
           decodeCtx.drawImage(videoElement, 0, 0, videoElement.videoWidth, videoElement.videoHeight);
           const startTime = Date.now();
           let endTime;
           let bc;
 
-          decode(decodeCtx, this.state.selectedType)
-          .then((result) => {
-            bc = result;
+          try {
+            bc = await decode(decodeCtx, this.state.selectedType);
             endTime = Date.now();
             this.setState({currentQR: bc ? bc.rawValue: ''});
-          })
-          .catch((err) => {
+          }catch (err) {
             endTime = Date.now();
             console.log('err decoding', err);
             this.setState({decodeError: err.message});
-          })
-          .then(async () => {
-            ctx.drawImage(decodeCanvas, 0, 0, videoElement.videoWidth, videoElement.videoHeight);
-            if(bc) {
-              const cp = bc.cornerPoints;
-              ctx.beginPath();
-              ctx.moveTo(cp[0].x, cp[0].y);
-              ctx.lineTo(cp[1].x, cp[1].y);
-              ctx.lineTo(cp[2].x, cp[2].y);
-              ctx.lineTo(cp[3].x, cp[3].y);
-              ctx.lineTo(cp[0].x, cp[0].y);
-              ctx.closePath();
-              ctx.stroke();
-              
-            }
+          }
+          
+          ctx.drawImage(decodeCanvas, 0, 0, videoElement.videoWidth, videoElement.videoHeight);
+          if(bc) {
+            const cp = bc.cornerPoints;
+            ctx.beginPath();
+            ctx.moveTo(cp[0].x, cp[0].y);
+            ctx.lineTo(cp[1].x, cp[1].y);
+            ctx.lineTo(cp[2].x, cp[2].y);
+            ctx.lineTo(cp[3].x, cp[3].y);
+            ctx.lineTo(cp[0].x, cp[0].y);
+            ctx.closePath();
+            ctx.stroke();
             
-            times.push({val: endTime - startTime, bc: bc ? 1 : 0});
-            if(times.length > 10) {
-              times.shift();
-            }
+          }
+          
+          times.push({val: endTime - startTime, bc: bc ? 1 : 0});
+          if(times.length > 10) {
+            times.shift();
+          }
 
-            const totalTime = times.reduce((acc, t) => acc + t.val, 0);
-            const totalHits = times.reduce((acc, t) => acc + t.bc, 0);
-            this.setState({avgTime: totalTime/times.length, hitPct: totalHits/times.length});
-            await sleep(100);
-            requestAnimationFrame(onframe);
-          });
-          
-          
+          const totalTime = times.reduce((acc, t) => acc + t.val, 0);
+          const totalHits = times.reduce((acc, t) => acc + t.bc, 0);
+          this.setState({avgTime: totalTime/times.length, hitPct: totalHits/times.length});
+          requestAnimationFrame(onframe);
         };
 
         requestAnimationFrame(onframe);
@@ -102,16 +94,11 @@ class App extends Component {
 
       videoElement.srcObject = ms;
       videoElement.load();
-      videoElement.play()
-        .catch(error => {
-          console.error("Auto Play Error", error);
-        });
+      videoElement.play();
 
-    })
-    .catch((error) =>{
+    } catch(error) {
       console.log('Error adding stream' + error);
-      //reject(error);
-    });
+    }
   }
 
   render() {
