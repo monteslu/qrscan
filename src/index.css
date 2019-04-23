@@ -22,3 +22,6 @@ a {
   width: 400px;
   display: inline-block;
 }
+.qr-code-output-no-link {
+  color: default;
+}
