@@ -108,7 +108,17 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <div style={{width: '95%', margin: '10px'}}>
-            <span style={{float: 'left'}}>Code: <span style={{color: 'lightblue'}}>{this.state.currentQR || ''}</span></span>
+            <span style={{float: 'left'}}>Code: 
+              {this.state.currentQR && (
+                <a
+                  href={this.state.currentQR}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {this.state.currentQR}
+                </a>
+              )}              
+            </span>
             <span style={{}}>Hit: <span style={{color: hitColor}}>{Math.round(hitPct * 100)}%</span></span>
             <span style={{float: 'right'}}>Avg. time(ms): <span style={{color: 'lightblue'}}>{(this.state.avgTime || 0).toFixed(1)}</span></span>
           </div>
