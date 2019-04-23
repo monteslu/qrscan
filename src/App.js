@@ -11,6 +11,13 @@ class App extends Component {
 
   canvasRef = React.createRef();
 
+  checkForUrl(qrOutput) {
+    const expression = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
+    const regexCheckForUrl = new RegExp(expression);
+
+    return (qrOutput.match(regexCheckForUrl)) ? true : false 
+  }
+
   async componentDidMount() {
 
     console.log(this.canvasRef);
@@ -108,7 +115,26 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <div style={{width: '95%', margin: '10px'}}>
-            <span style={{float: 'left'}}>Code: <span style={{color: 'lightblue'}}>{this.state.currentQR || ''}</span></span>
+            <span style={{float: 'left'}}>Code:
+              {' '}
+              {this.state.currentQR && this.checkForUrl(this.state.currentQR) ?
+                (
+                  <a
+                    href={this.state.currentQR}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                  >
+                    {this.state.currentQR}
+                  </a>
+                ) : (
+                  <span
+                    className='qr-code-output-no-link'
+                  >
+                    {this.state.currentQR}
+                  </span>
+                )
+              }              
+            </span>
             <span style={{}}>Hit: <span style={{color: hitColor}}>{Math.round(hitPct * 100)}%</span></span>
             <span style={{float: 'right'}}>Avg. time(ms): <span style={{color: 'lightblue'}}>{(this.state.avgTime || 0).toFixed(1)}</span></span>
           </div>
