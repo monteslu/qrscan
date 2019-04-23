@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 
 import { decode } from './qrclient';
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 
 class App extends Component {
   state = {
