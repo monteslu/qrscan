@@ -1,6 +1,6 @@
 # Browser QR Scanning
 
-live demo: [https://qr_scan.netlify.com](https://qr_scan.netlify.com)
+live demo: [https://qr-scan.netlify.com](https://qr-scan.netlify.com)
 
 ## install
 `npm i`
